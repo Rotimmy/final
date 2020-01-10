@@ -7,11 +7,11 @@ body {
 a {
   color: #b596e0;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
 }
 h1 {
   color: #b596e0;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .hidden {
@@ -144,7 +144,7 @@ span.author {
   padding: 2px 10px 2px 0;
   border-right: 1px solid;
   margin-right: 1px;
-  font-weight: 600;
+  font-weight: 500;
 }
 div.caption {
   margin: 10px 0 15px;
