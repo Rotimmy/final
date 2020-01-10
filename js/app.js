@@ -21,9 +21,8 @@ $(document).ready(function(){
 
 function getData(){
   let url = "https://api.instagram.com/v1/users/self/media/recent/?access_token=1125976861.22fd430.3c5674ff251d49baa3062292bd4fd71e";
-
+  // fetch data
   $.get(url).done(function(res){
-    feedArr = []; // empty feed array
     let postRef = postAppRef.ref("approved");
     postRef.remove()
       .then(function() {
@@ -96,7 +95,7 @@ function loadFeed(){
           $imgWrap = $("<div></div>").addClass("post-img-wrap"),
           $imgInner = $("<div></div>").addClass("post-img-inner"),
           $openIcon = $("<img>").addClass("icon").attr("src", "images/open.png"),
-          $approvalBtn = $("<img>").addClass("approval-btn").attr("src", "images/exclude.png"),
+          $approvalBtn = $("<img>").addClass("approval-btn").attr("src", "images/minus_wh.png"),
           $body = $("<div></div>").addClass("post-body"),
           $byline = $("<div></div>").addClass("byline"),
           $author = $("<span></span>").addClass("author"),
@@ -148,18 +147,17 @@ function curate(){
     $post.toggleClass("exclude");
   })
   // delete posts
-  $("#curate").click(function(e){
+  $("#curate-btn").click(function(e){
     e.preventDefault();
     $.each(excluded, function(i){
       excluded[i].remove();
     })
   });
-
 };
 
 // popUp
 function popUp(){
-  $("#feed").on({
+  $("#feed").on({ // show popUp icon on hover with delegation
     mouseenter: function () {
       $(this).find(".icon").css("opacity", "1");
     },
@@ -167,15 +165,15 @@ function popUp(){
       $(this).find(".icon").css("opacity", "0");
     }
   }, ".post-img-wrap");
-  $("#feed")
+  $("#feed") // open popUp on click with delegation
     .on("click", ".post-img-wrap", function() {
       let $post = $(this).parent(),
           key = $post.attr("data-id"),
           targetPost = postAppRef.ref("approved/" + key + "/post");
-
+      // get snapshot of post data
       targetPost.once("value").then((snapshot)=> {
         let postData = snapshot.val();
-
+        // load popUp
         $("#popUpImg").css("background-image", "url('" + postData.img + "')");
         $("#popUpUsername").text(postData.username);
         $("#popUpLikes").text(postData.likes.count);
@@ -184,25 +182,23 @@ function popUp(){
         } else {
           $("#popUpCaption").text("...").attr("data-id", key);
         }
-        $("a.popUpAction").attr("href", postData.url);
+        $("#popUpAction").attr("href", postData.url);
         $("#popUp").removeClass("loader").removeClass("hidden");
-        // $("#popUp .container").show();
       }).catch((errorObject)=> {
           console.log("The read failed: " + errorObject.code);
       });
   });
+  editCaption(); // edit caption in popUp
   // hide popUp
   $("#closePopUp").click(function(){
     $("#popUp").addClass("hidden");
   });
-  editCaption();
 };
 // edit caption (UPDATE)
 function editCaption(){
   // show/hide edit button on hover
   $("#popUpBody").hover(
     function() {
-      console.log("trigger");
       $("#captionEdit").fadeIn("fast");
     }, function() {
       $("#captionEdit").fadeOut();
@@ -220,13 +216,15 @@ function editCaption(){
         $(this).text("edit").removeClass("save");
         $("#popUpCaption").attr("contenteditable", "false").css({
           'border': 'none',
-          'outline': 'none'
+          'outline': 'none',
+          'background': 'none'
         });
       } else {
         $(this).text("save").addClass("save");
         $("#popUpCaption").attr("contenteditable", "true").css({
-          'border': 'black solid 1px',
-          'outline': 'none'
+          'border': 'none',
+          'outline': 'none',
+          'background': '#ccc9e0'
         }).focus();
       };
     }).catch((errorObject)=> {
